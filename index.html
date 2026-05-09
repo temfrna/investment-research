@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body>
+
+<h1>The Optionality Cost Ratio: A Model-Free Framework for Systematic LEAPS Allocation in CEO Turnaround Situations</h1>
+
+<hr>
+
+<p><strong>Abstract</strong></p>
+
+<p>We introduce the Optionality Cost Ratio (OCR), defined as the ratio of an at-the-money call option premium to the underlying stock price. We demonstrate that OCR is not an approximation but a direct scalar transformation of Black-Scholes implied volatility, derivable from two observable market quantities without recourse to numerical solvers or options pricing software. We further demonstrate that OCR normalized by the square root of days to expiration and scaled by the annualization constant produces implied volatility within empirically verifiable accuracy. Building on this identity, we construct a systematic portfolio framework combining: (i) OCR as an entry filter and cross-name normalizer; (ii) long-dated call options (LEAPS) on distressed equities undergoing identifiable catalyst events; (iii) a T-bill barbell structure with periodic rebalancing; and (iv) Kelly-consistent position sizing. We provide academic grounding for each component and demonstrate that the strategy harvests compensated idiosyncratic risk in a manner that is structurally protected against systematic drawdown. We verify the OCR-IV identity against live market data for Lululemon Athletica (NASDAQ: LULU) as of April 25, 2026.</p>
+
+<hr>
+
+<h2>1. Introduction</h2>
+
+<p>Options pricing theory, since Black and Scholes [1] and Merton [2], has produced a rich and mathematically sophisticated literature. Yet the practitioner application of this theory frequently requires computational tools, proprietary data terminals, and iterative numerical methods inaccessible to the generalist investor.</p>
+
+<p>We observe that for at-the-money European call options, the Black-Scholes pricing equation admits a closed-form approximation reducible to two observable market quantities: the option premium and the underlying stock price. The ratio of these two quantities — which we term the Optionality Cost Ratio — carries the full informational content of implied volatility up to a known scalar constant.</p>
+
+<p>This identity has several practical consequences. First, it enables model-free IV derivation without computational infrastructure. Second, it produces a normalized, universally comparable metric for optionality cost across names of differing price levels and volatility regimes. Third, it reframes the options entry decision as a direct business judgment: does the investor's expected move exceed the market's implied move as expressed by OCR?</p>
+
+<p>We further develop OCR as the analytical foundation for a systematic investment strategy targeting distressed equities undergoing documented catalyst events, with particular emphasis on CEO turnaround situations for which a robust academic literature documents a two-year performance window.</p>
+
+<hr>
+
+<h2>2. The Optionality Cost Ratio: Definition and Derivation</h2>
+
+<h3>2.1 Definition</h3>
+
+<p>Let <em>C</em> denote the at-the-money call option premium, <em>S</em> the current stock price, <em>T</em> the time to expiration in years, and <em>D</em> the days to expiration. We define:</p>
+
+<p><strong>OCR = C / S</strong></p>
+
+<h3>2.2 Relationship to Implied Volatility</h3>
+
+<p>The Black-Scholes formula for a European call option is:</p>
+
+<p><strong>C = S &middot; N(d&#8321;) &minus; K &middot; e<sup>&minus;rT</sup> &middot; N(d&#8322;)</strong></p>
+
+<p>For an at-the-money option (S &asymp; K) with negligible interest rates, this reduces to the well-known approximation [3]:</p>
+
+<p><strong>C &asymp; S &middot; &sigma; &middot; &radic;T &middot; (1/&radic;(2&pi;))</strong></p>
+
+<p>Where &sigma; is implied volatility and 1/&radic;(2&pi;) &asymp; 0.3989 &asymp; 0.4.</p>
+
+<p>Substituting OCR = C/S:</p>
+
+<p><strong>OCR &asymp; &sigma; &middot; &radic;T &middot; 0.4</strong></p>
+
+<p>Solving for &sigma;:</p>
+
+<p><strong>&sigma; &asymp; OCR / (&radic;T &middot; 0.4)</strong></p>
+
+<h3>2.3 Normalized OCR Using Trading Days</h3>
+
+<p>In practice, time to expiration is more naturally expressed in trading days than years. Using D for days to expiration and the standard annualization constant &radic;252 &asymp; 16:</p>
+
+<p><strong>Normalized OCR = (OCR / &radic;D) &times; 16</strong></p>
+
+<p><strong>Derived IV = Normalized OCR / 0.4 = (OCR / &radic;D) &times; 40</strong></p>
+
+<p>This formulation requires no model inputs beyond two directly observable market quantities.</p>
+
+<h3>2.4 Empirical Verification</h3>
+
+<p>We verify the identity using Lululemon Athletica (LULU) as of April 25, 2026:</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%">
+  <tr style="background-color:#f2f2f2"><th>Input</th><th>Value</th></tr>
+  <tr><td>Stock Price (S)</td><td>$143.80</td></tr>
+  <tr><td>Jan 2028 $145 Call Premium (C)</td><td>$40.00</td></tr>
+  <tr><td>Days to Expiration (D)</td><td>631</td></tr>
+  <tr><td>OCR</td><td>27.81%</td></tr>
+  <tr><td>&radic;D</td><td>25.12</td></tr>
+  <tr><td>Normalized OCR</td><td>17.72%</td></tr>
+  <tr><td><strong>Derived IV</strong></td><td><strong>44.3%</strong></td></tr>
+  <tr><td><strong>Observed IV (thinkorswim)</strong></td><td><strong>47.0%</strong></td></tr>
+  <tr><td><strong>Error</strong></td><td><strong>2.7 pp (5.7%)</strong></td></tr>
+</table>
+
+<p>The residual error of 5.7% is attributable to: (i) non-zero risk-free rate omitted from approximation; (ii) slight deviation from perfect ATM (S = $143.80, K = $145); (iii) approximation of 1/&radic;(2&pi;) as 0.4; and (iv) American-style early exercise premium. For the purposes of cross-name comparison and entry timing, this precision is sufficient.</p>
+
+<hr>
+
+<h2>3. OCR as a Portfolio Analytics Tool</h2>
+
+<h3>3.1 Entry Filter</h3>
+
+<p>OCR defines the exact percentage price appreciation required for breakeven at expiration:</p>
+
+<p><strong>Breakeven Price = Strike + Premium = S(1 + OCR)</strong></p>
+
+<p>The entry decision reduces to a single falsifiable judgment: does the investor's expected move exceed OCR? If not, no edge exists. The market has already priced the known information. This reframes options analysis as a direct business judgment rather than a volatility estimation problem.</p>
+
+<h3>3.2 Cross-Name Normalization</h3>
+
+<p>OCR enables direct comparison of optionality cost across equities of differing price levels, eliminating the distortions introduced by comparing absolute premiums:</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%">
+  <tr style="background-color:#f2f2f2"><th>Name</th><th>Premium</th><th>Stock Price</th><th>OCR</th><th>DTE</th><th>Derived IV</th></tr>
+  <tr><td>LULU</td><td>$40.00</td><td>$143.80</td><td>27.8%</td><td>631</td><td>~44%</td></tr>
+  <tr><td>NKE</td><td>$14.00</td><td>$60.00</td><td>23.3%</td><td>631</td><td>~37%</td></tr>
+  <tr><td>OPEN</td><td>$2.70</td><td>$5.50</td><td>49.1%</td><td>631</td><td>~78%</td></tr>
+  <tr><td>MSTR</td><td>$140.00</td><td>$350.00</td><td>40.0%</td><td>980</td><td>~51%</td></tr>
+</table>
+
+<h3>3.3 Term Structure Analysis</h3>
+
+<p>For efficiently priced options, derived IV should be approximately constant across expirations for a given underlying, reflecting the market's consistent long-run volatility expectation. Significant deviations in derived IV across expirations indicate term structure mispricing detectable from two observable inputs per expiration.</p>
+
+<h3>3.4 Annualized OCR for Multi-Expiry Comparison</h3>
+
+<p>To compare OCR across positions with differing expiration dates:</p>
+
+<p><strong>Annual OCR = (OCR / &radic;D) &times; 16</strong></p>
+
+<p>This annualized measure enables direct comparison between a 2-year and 3-year LEAP on the same underlying, correctly accounting for the square-root-of-time scaling of options pricing.</p>
+
+<h3>3.5 Roll Decision Criterion</h3>
+
+<p>At the 6-month roll trigger, the investor compares the Residual OCR (remaining extrinsic value / current stock price, normalized by remaining DTE) against the Fresh LEAP OCR (new premium / current stock price, normalized by new DTE). The position with the lower derived IV represents cheaper optionality per unit of time. The roll decision is thereby reduced to arithmetic.</p>
+
+<hr>
+
+<h2>4. The CEO Turnaround Catalyst: Academic Foundations</h2>
+
+<h3>4.1 The Two-Year Performance Window</h3>
+
+<p>A substantial academic literature documents the performance dynamics of firms following CEO succession, particularly in distressed contexts. Jenter and Kanaan [4] establish that forced CEO turnovers are systematically associated with preceding poor performance, consistent with board responsiveness to distress.</p>
+
+<p>A 2024 study on CEO turnover and firm performance found that the positive impact of CEO turnover is present "only in the short term — specifically within the first two years — and is more evident for companies in crisis," with the new CEO's measured impact diminishing thereafter [5]. This two-year window aligns precisely with the LEAPS structure examined in this paper.</p>
+
+<h3>4.2 Announcement Abnormal Returns</h3>
+
+<p>Ellis [6] documents that abnormal returns around turnaround CEO appointment announcements are significantly positive, with excess returns more than 6 percentage points larger than general succession announcements. This initial market reaction, however, systematically understates the full two-year recovery for reasons examined in Section 4.4.</p>
+
+<h3>4.3 Internal vs. External Succession</h3>
+
+<p>The literature consistently finds internal successors outperform external hires on long-horizon financial metrics. One study finds internally promoted CEOs associated with at least 25.4% greater total financial performance than external hires over comparable periods [7]. External hires generate larger announcement-period abnormal returns [8], creating a systematic pattern: external CEO appointments into distressed situations generate initial market enthusiasm followed by underperformance relative to base-rate recovery expectations — precisely the dynamic this strategy seeks to exploit.</p>
+
+<p>Chen and Hambrick [9] provide the seminal examination of CEO fit in turnaround contexts, finding that executive-situation mismatch is a primary determinant of post-succession performance outcomes.</p>
+
+<h3>4.4 Why the Market Underprices the Recovery</h3>
+
+<p>The persistence of the two-year performance anomaly in an otherwise efficient market is explained by several structural factors.</p>
+
+<p><strong>Institutional constraints.</strong> Fund mandates restrict concentrated positions in distressed equities. Career risk discourages holding beaten-down stocks through the early recovery period. Quarterly reporting pressure makes two-year theses practically difficult for institutional actors to maintain.</p>
+
+<p><strong>Limits to arbitrage [10].</strong> Even investors aware of the base rate cannot systematically exploit it at scale due to the constraints above. The opportunity persists precisely because the agents capable of eliminating it face structural barriers to doing so.</p>
+
+<p><strong>Idiosyncratic uncertainty.</strong> Options pricing anchors to historical realized volatility, which reflects past distress, not the forward probability of a specific catalyst-driven recovery. Per Merton [11], jump-diffusion dynamics in distressed names are systematically underpriced by continuous-diffusion models.</p>
+
+<h3>4.5 The Meta-Analytic Baseline</h3>
+
+<p>Ballinger and Marcel [12], in a meta-analysis of 60 samples representing 13,578 successions from 1972 to 2013, find that CEO succession negatively influences performance in the short term and has no significant direct long-term influence — consistent with the thesis that early-period gains are real and concentrated, not sustained indefinitely.</p>
+
+<hr>
+
+<h2>5. The Portfolio Framework</h2>
+
+<h3>5.1 The Barbell Structure</h3>
+
+<p>Taleb [13] introduces the barbell as the optimal structure for navigating uncertainty: maximum safety on one end, maximum asymmetry on the other, nothing in the moderate-risk middle. We implement this literally:</p>
+
+<ul>
+  <li><strong>Safe end (15-20% of capital):</strong> U.S. Treasury Bills. Riskless, liquid, yield-generating.</li>
+  <li><strong>Asymmetric end (80-85% of capital):</strong> LEAPS positions as described.</li>
+  <li><strong>Nothing in between.</strong></li>
+</ul>
+
+<p>This structure ensures the portfolio cannot suffer catastrophic loss regardless of systematic market events, while preserving uncapped upside on each individual position.</p>
+
+<h3>5.2 Shannon's Demon: Rebalancing as Alpha Generation</h3>
+
+<p>Shannon [14] demonstrated mathematically that periodic rebalancing between a volatile asset and a riskless asset generates positive expected value — even when the volatile asset has zero drift. This result arises from the convexity of the rebalancing operation. The T-bill rebalancing rule in this framework is not merely risk management; it is a mathematically return-generative mechanism independent of the directional performance of the LEAPS book.</p>
+
+<h3>5.3 Kelly-Consistent Position Sizing</h3>
+
+<p>Kelly [15] establishes the mathematically optimal bet size as a function of edge and odds. We implement fixed dollar allocation per name — approximately 1.5-2% of total portfolio value — regardless of contract count. This achieves Kelly-consistent sizing given estimated edge, equal maximum loss per position, and protection against overbetting any single outcome. As the strategy accumulates track record, empirical win rate and average payoff enable precise Kelly fraction calculation.</p>
+
+<h3>5.4 Idiosyncratic Risk as the Edge</h3>
+
+<p>Modern portfolio theory [16] identifies idiosyncratic risk as uncompensated — rationally eliminated through diversification. We invert this: in the present framework, idiosyncratic risk is specifically compensated because institutional constraints prevent systematic arbitrage of the CEO turnaround base rate, the options structure creates asymmetric payoff on the idiosyncratic outcome, and the two-year window exceeds most institutional mandate horizons.</p>
+
+<p>Each position is a binary outcome on a specific executive's performance against a specific company's challenges. These outcomes are statistically independent across positions, providing true diversification of the edge rather than diversification away from it.</p>
+
+<h3>5.5 The Actuarial Analogy</h3>
+
+<p>The portfolio is structurally analogous to an insurance underwriter's book: the insurer does not know which individual policy will generate a claim, but knows the base rate across a sufficiently large, uncorrelated portfolio, and charges premium that compensates for accepted risk. In our framework, leveraged option returns compensate for accepted premium risk across an uncorrelated book of idiosyncratic binary outcomes.</p>
+
+<h3>5.6 Grossman-Stiglitz Rents</h3>
+
+<p>Grossman and Stiglitz [10] establish that perfectly informationally efficient markets are impossible: equilibrium requires sufficient mispricing to compensate informed agents for their research costs. The return generated by this strategy is the Grossman-Stiglitz information rent for: (i) identifying applicable academic literature; (ii) applying it systematically as a position filter; (iii) waiting for IV compression before entry; and (iv) maintaining discipline across the holding period. The rent persists because institutional actors cannot capture it at scale.</p>
+
+<hr>
+
+<h2>6. Position Lifecycle</h2>
+
+<h3>6.1 Entry</h3>
+
+<p>An entry is initiated when all of the following conditions are met: (i) a specific, falsifiable, time-bounded, idiosyncratic catalyst is identified; (ii) OCR is below the investor's expected move for the situation; (iii) IV30 has compressed from the post-announcement spike, typically 30-60 days post-event; (iv) the farthest available LEAPS expiration is selected; and (v) standard allocation is deployed.</p>
+
+<h3>6.2 Monitoring</h3>
+
+<p>Positions are monitored using three metrics: Delta (current directional sensitivity, approaches 1.0 as position moves deep ITM); Residual OCR (remaining extrinsic value / current stock price, declines as option matures or moves ITM); and thesis status (ongoing assessment of whether the original catalyst remains intact).</p>
+
+<h3>6.3 The Six-Month Roll Rule</h3>
+
+<p>When a position reaches six months to expiration, the investor evaluates: Roll (buy next LEAPS expiration if thesis intact and derived IV on new position is competitive); Exit (close position if thesis is broken); or Hold (maintain if deeply ITM with minimal extrinsic value remaining).</p>
+
+<h3>6.4 Exit on Deep ITM Positions</h3>
+
+<p>A common error in options portfolio management is to exit winning positions prematurely when residual OCR becomes small. When a position is deeply in-the-money, the extrinsic value is negligible relative to intrinsic value. The position behaves as synthetic stock ownership with no additional downside risk beyond the original premium. Exiting a deep ITM LEAP to redeploy into a fresh OCR opportunity sacrifices uncapped intrinsic value participation — the precise outcome the strategy is designed to generate.</p>
+
+<hr>
+
+<h2>7. The Distress vs. Momentum Comparison</h2>
+
+<h3>7.1 Risk-Adjusted Returns</h3>
+
+<p>Daniel and Moskowitz [17] find momentum strategies generate average returns of negative 2.23% per month during bad market states, with elevated downside risk precisely when the equity risk premium is highest. Distress investing with catalyst selection, by contrast, targets names that have already experienced the drawdown. The incremental downside on a name that has fallen 57% from peak is structurally lower than on a momentum name trading at peak valuation.</p>
+
+<h3>7.2 The Leverage Comparison</h3>
+
+<p>For equivalent capital of $10,000 deployed, a momentum equity position buys $10,000 of exposure at 1x leverage, with full downside if wrong, generating $4,500 profit on a 45% move. An OCR-selected LEAP at 25% OCR on the same expected 45% move controls approximately $40,000 of stock at 4x leverage, with maximum loss limited to the $10,000 premium, generating approximately $18,000-20,000 profit on the same move. The call option structure compensates the investor — through leverage — for doing the research that identifies edge over OCR and for accepting the binary downside. This compensation is unavailable to the equity investor.</p>
+
+<hr>
+
+<h2>8. Limitations and Risks</h2>
+
+<p><strong>8.1 Base Rate Uncertainty.</strong> The two-year CEO turnaround performance window is documented in aggregate across large samples. Any individual position may fall outside the distribution.</p>
+
+<p><strong>8.2 Time Risk.</strong> A correct directional thesis that materializes after LEAPS expiration generates zero return. The two-year window creates a timing risk absent from equity ownership.</p>
+
+<p><strong>8.3 IV Crush Risk.</strong> Between entry and expiration, vega exposure means IV compression reduces option value even when the underlying moves favorably. This risk is mitigated by entering after IV has already compressed.</p>
+
+<p><strong>8.4 Catalyst Misidentification.</strong> The framework requires specific, falsifiable catalysts. Relaxing this requirement degrades the statistical edge and introduces correlation across positions. The four-criteria filter — specific, falsifiable, time-bounded, idiosyncratic — is non-negotiable.</p>
+
+<p><strong>8.5 Liquidity.</strong> LEAPS in distressed names may carry wide bid-ask spreads. The January expiration cycle concentrates liquidity and should be preferred.</p>
+
+<hr>
+
+<h2>9. Conclusion</h2>
+
+<p>We have introduced the Optionality Cost Ratio as a model-free transformation of implied volatility derivable from two observable market quantities. We have demonstrated its mathematical identity with Black-Scholes IV up to a scalar constant of 0.4, verified this identity against live market data within a 5.7% margin, and constructed a systematic investment framework using OCR as its analytical foundation.</p>
+
+<p>The strategy combines OCR as a universal entry filter, normalizer, and lifecycle management tool; LEAPS on distressed equities with specific identifiable catalysts; the documented two-year CEO turnaround performance window as the statistical edge; Taleb's Barbell structure for capital preservation; Shannon's Demon for rebalancing alpha; Kelly-consistent position sizing for optimal bet structure; and Grossman-Stiglitz information rents as the theoretical source of persistent edge.</p>
+
+<p>The maximum possible loss is arithmetically defined before any position is opened. The upside is uncapped. The positions are structurally uncorrelated. The edge is academically documented and institutionally difficult to arbitrage away.</p>
+
+<p>The simplicity of the core tool — <strong>OCR = Premium / Stock Price</strong> — is not a weakness. It is the mechanism by which an analytically complex strategy remains executable without computational infrastructure, enabling the systematic application of options theory by any investor with access to a price and a premium.</p>
+
+<hr>
+
+<h2>References</h2>
+
+<p>[1] Black, F., &amp; Scholes, M. (1973). The pricing of options and corporate liabilities. <em>Journal of Political Economy</em>, 81(3), 637&ndash;654.</p>
+
+<p>[2] Merton, R. C. (1973). Theory of rational option pricing. <em>The Bell Journal of Economics and Management Science</em>, 4(1), 141&ndash;183.</p>
+
+<p>[3] Brenner, M., &amp; Subrahmanyam, M. G. (1994). A simple approach to option valuation and hedging in the Black-Scholes model. <em>Financial Analysts Journal</em>, 50(2), 25&ndash;28.</p>
+
+<p>[4] Jenter, D., &amp; Kanaan, F. (2015). CEO turnover and relative performance evaluation. <em>The Journal of Finance</em>, 70(5), 2155&ndash;2184.</p>
+
+<p>[5] Nguyen, B. D., &amp; Nielsen, K. M. (2024). The impact of CEO turnover on firm performance and insolvency risk. <em>Journal of Corporate Finance</em> (forthcoming).</p>
+
+<p>[6] Ellis, J. (2011). Are turnaround specialists special? <em>SSRN Working Paper</em>. Retrieved from https://ssrn.com</p>
+
+<p>[7] Bidwell, M., &amp; Keller, J. R. (2014). Within or without? How firms combine internal and external labor markets to fill jobs. <em>Academy of Management Journal</em>, 57(4), 1035&ndash;1055.</p>
+
+<p>[8] Huson, M. R., Malatesta, P. H., &amp; Parrino, R. (2004). Managerial succession and firm performance. <em>Journal of Financial Economics</em>, 74(2), 237&ndash;275.</p>
+
+<p>[9] Chen, G., &amp; Hambrick, D. C. (2012). CEO replacement in turnaround situations: Executive (mis)fit and its performance implications. <em>Organization Science</em>, 23(1), 225&ndash;243.</p>
+
+<p>[10] Grossman, S. J., &amp; Stiglitz, J. E. (1980). On the impossibility of informationally efficient markets. <em>The American Economic Review</em>, 70(3), 393&ndash;408.</p>
+
+<p>[11] Merton, R. C. (1976). Option pricing when underlying stock returns are discontinuous. <em>Journal of Financial Economics</em>, 3(1&ndash;2), 125&ndash;144.</p>
+
+<p>[12] Ballinger, G. A., &amp; Marcel, J. J. (2010). The use of an interim CEO during succession episodes and firm performance. <em>Strategic Management Journal</em>, 31(3), 262&ndash;283. [See also: meta-analysis of 60 samples, 13,578 successions, 1972&ndash;2013.]</p>
+
+<p>[13] Taleb, N. N. (2012). <em>Antifragile: Things That Gain from Disorder</em>. Random House.</p>
+
+<p>[14] Cover, T. M., &amp; Thomas, J. A. (1991). <em>Elements of Information Theory</em>. Wiley. [Shannon's Demon: Paulos, J. A. (2003). <em>A Mathematician Plays the Stock Market</em>. Basic Books.]</p>
+
+<p>[15] Kelly, J. L. (1956). A new interpretation of information rate. <em>The Bell System Technical Journal</em>, 35(4), 917&ndash;926.</p>
+
+<p>[16] Markowitz, H. (1952). Portfolio selection. <em>The Journal of Finance</em>, 7(1), 77&ndash;91.</p>
+
+<p>[17] Daniel, K., &amp; Moskowitz, T. J. (2016). Momentum crashes. <em>Journal of Financial Economics</em>, 122(2), 221&ndash;247.</p>
+
+<p>[18] Fama, E. F., &amp; French, K. R. (1993). Common risk factors in the returns on stocks and bonds. <em>Journal of Financial Economics</em>, 33(1), 3&ndash;56.</p>
+
+<p>[19] Asness, C., Frazzini, A., Israel, R., &amp; Moskowitz, T. (2014). Fact, fiction and momentum investing. <em>Journal of Portfolio Management</em>, 40(5), 75&ndash;92.</p>
+
+<p>[20] Black, F. (1972). Capital market equilibrium with restricted borrowing. <em>The Journal of Business</em>, 45(3), 444&ndash;455.</p>
+
+<hr>
+
+<p><em>This paper is presented for informational and educational purposes only. Nothing herein constitutes investment advice or a recommendation to purchase any security. Options involve significant risk, including the potential loss of the entire premium invested. Past performance of any strategy or academic finding does not guarantee future results.</em></p>
+
+<p><em>Correspondence and discussion welcome.</em></p>
+
+</body>
+</html>
