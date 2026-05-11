@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minute-Resolution Fee Dynamics on Bitcoin and Ethereum</title>
+<style>
+  :root {
+    --text: #1a1a1a;
+    --muted: #555;
+    --rule: #cfcfcf;
+    --bg: #fdfdfc;
+    --accent: #8a4b00;
+    --link: #1a4d8f;
+    --table-head: #f3f1ec;
+    --table-row-alt: #fafaf7;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Charter", "Iowan Old Style", "Palatino Linotype", "Palatino", Georgia, "Times New Roman", serif;
+    font-size: 17px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 28px 96px;
+  }
+  .breadcrumb {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 28px;
+    letter-spacing: 0.02em;
+  }
+  .breadcrumb a { color: var(--link); text-decoration: none; }
+  .breadcrumb a:hover { text-decoration: underline; }
+  h1 {
+    font-size: 30px;
+    line-height: 1.25;
+    font-weight: 700;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+  }
+  h1 .sub {
+    display: block;
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--muted);
+    margin-top: 6px;
+    line-height: 1.3;
+  }
+  .meta {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 14px 0 8px;
+  }
+  hr.divider {
+    border: none;
+    border-top: 1px solid var(--rule);
+    margin: 28px 0;
+  }
+  h2 {
+    font-size: 21px;
+    font-weight: 700;
+    margin: 44px 0 14px;
+    line-height: 1.3;
+    letter-spacing: -0.005em;
+  }
+  h3 {
+    font-size: 17px;
+    font-weight: 700;
+    margin: 26px 0 8px;
+    color: #222;
+  }
+  p { margin: 0 0 14px; text-align: justify; hyphens: auto; }
+  .abstract {
+    background: #f7f5f0;
+    border-left: 3px solid var(--accent);
+    padding: 18px 22px;
+    margin: 24px 0 12px;
+    font-size: 15.5px;
+    line-height: 1.6;
+  }
+  .abstract p { margin: 0; }
+  .abstract .label {
+    font-weight: 700;
+    margin-right: 6px;
+  }
+  figure {
+    margin: 28px 0 32px;
+    text-align: center;
+  }
+  figure img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #ececec;
+    background: white;
+  }
+  figcaption {
+    font-size: 13.5px;
+    color: var(--muted);
+    line-height: 1.5;
+    margin-top: 10px;
+    text-align: left;
+    padding: 0 4px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 18px 0 8px;
+    font-size: 14.5px;
+    font-family: "Charter", Georgia, serif;
+  }
+  th, td {
+    padding: 7px 10px;
+    text-align: left;
+    border-bottom: 1px solid #e6e3dc;
+  }
+  th {
+    background: var(--table-head);
+    font-weight: 700;
+    border-top: 1px solid #c8c5be;
+    border-bottom: 1px solid #c8c5be;
+  }
+  td:not(:first-child), th:not(:first-child) { text-align: right; }
+  tbody tr:nth-child(even) td { background: var(--table-row-alt); }
+  .table-cap {
+    font-size: 13.5px;
+    color: var(--muted);
+    line-height: 1.5;
+    margin: 8px 0 26px;
+    padding: 0 2px;
+  }
+  code, .mono {
+    font-family: "SF Mono", "Menlo", "Consolas", monospace;
+    font-size: 13.5px;
+    background: #f0eee8;
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+  .footer {
+    margin-top: 60px;
+    padding-top: 22px;
+    border-top: 1px solid var(--rule);
+    font-size: 13.5px;
+    color: var(--muted);
+    font-style: italic;
+    line-height: 1.55;
+  }
+  a { color: var(--link); }
+  @media (max-width: 600px) {
+    .wrap { padding: 36px 18px 64px; }
+    body { font-size: 16px; }
+    h1 { font-size: 26px; }
+    h1 .sub { font-size: 17px; }
+    h2 { font-size: 19px; }
+    table { font-size: 13px; }
+    th, td { padding: 6px 7px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="breadcrumb"><a href="../../">&larr; Back to papers</a></div>
+
+<h1>Minute-Resolution Fee Dynamics on Bitcoin and Ethereum<span class="sub">A Thirty-Day Cross-Chain Observational Study</span></h1>
+
+<div class="meta">Working paper &middot; v1.0 &middot; April 9 &ndash; May 9, 2026</div>
+
+<hr class="divider">
+
+<div class="abstract">
+<p><span class="label">Abstract.</span> We construct a minute-resolution dataset of Bitcoin and Ethereum fee-market state spanning roughly thirty calendar days (April 9 through May 9, 2026, UTC), comprising 42,279 timestamped observations of recommended transaction fees, mempool depth, and Bitcoin spot price. The collection window covers an unusually quiet regime in both chains: median Bitcoin fast-tier fees sat at 2 sat/vbyte and Ethereum fast-tier fees at 0.41 gwei, with both chains rarely experiencing meaningful congestion. Within this regime we document four findings. First, Bitcoin and Ethereum fee levels are only weakly correlated at minute resolution (Spearman &rho; = 0.15), suggesting that calm-regime fee dynamics on the two chains are driven primarily by chain-specific factors rather than common shocks. Second, mempool depth is a strong monotonic predictor of Bitcoin fees (&rho; = 0.37) but is essentially uncorrelated with Ethereum fees (&rho; = &minus;0.01), an artifact we attribute to the unreliability of pending-block transaction counts from public Ethereum RPC nodes. Third, both chains exhibit clear diurnal patterns; Bitcoin fees peak around 12:00 UTC and trough at 00:00 UTC, while Ethereum fees peak slightly earlier at 10:00 UTC, consistent with differing geographic concentrations of activity. Fourth, the contemporaneous relationship between Bitcoin fees and Bitcoin price &ndash; including realised volatility &ndash; is essentially absent in this calm regime, contradicting the common claim that price moves drive on-chain fee pressure. We document the dataset, present descriptive statistics and event case studies, and flag a methodological caveat regarding public-API fee feeds.</p>
+</div>
+
+<hr class="divider">
+
+<h2>1. Introduction</h2>
+
+<p>Transaction fees on Bitcoin and Ethereum are the price of blockspace, and they are the primary equilibrating mechanism between user demand and the fixed throughput of each chain. While substantial academic and industry attention has focused on fees during congestion episodes &ndash; the 2017 Bitcoin mempool blowout, the 2021 Ethereum NFT booms, the post-EIP-1559 transition, and the various inscription and rollup-spam events of 2023 and 2024 &ndash; relatively little has been published characterising fee markets during periods of low demand. Calm regimes are not merely the absence of interesting behaviour: they are the modal state of both chains and provide the baseline against which stress events should be measured.</p>
+
+<p>This paper contributes a minute-resolution dataset of Bitcoin and Ethereum fee markets covering thirty consecutive days during a notably quiet stretch, alongside parallel Bitcoin price observations. The contribution is predominantly empirical and descriptive. We do not attempt causal identification; we document what a calm cross-chain fee regime actually looks like at high frequency, and we surface several observations that, while not all individually novel, have not previously been reported in a single coherent dataset of this resolution.</p>
+
+<p>The remainder of the paper proceeds as follows. Section 2 describes the data and ingestion methodology. Section 3 presents descriptive statistics. Section 4 examines cross-chain co-movement. Section 5 documents intra-day patterns. Section 6 discusses three notable events recorded in the window, including a fee-API anomaly that informs a methodological caveat. Section 7 concludes and outlines next steps.</p>
+
+<h2>2. Data and Methods</h2>
+
+<h3>2.1&nbsp;&nbsp;Sources</h3>
+
+<p>Bitcoin fee tiers (fast, medium, slow, economy, minimum) and pending-transaction count are sourced from the public mempool.space API. Recommended fees are expressed in satoshis per virtual byte (sat/vbyte). Ethereum fee tiers (rapid, fast, standard, slow, expressed in gwei) are sourced from the beaconcha.in <em>gasnow</em> endpoint. Ethereum pending-transaction counts are obtained from a public RPC node via the <code>eth_getBlockByNumber</code> method with the <code>pending</code> tag. Bitcoin spot price (USD) is obtained from mempool.space's prices endpoint, which aggregates major spot venues.</p>
+
+<h3>2.2&nbsp;&nbsp;Ingestion and storage</h3>
+
+<p>An asynchronous Python ingester polls each endpoint on an approximately one-minute cadence and writes one row per source per minute to a PostgreSQL table. Bitcoin ingestion began on April 9, 2026 at 17:10 UTC; Ethereum ingestion was added on April 10, 2026 (first row 13:36 UTC); Bitcoin price ingestion was added on April 11, 2026 (first row 13:36 UTC). The dataset analysed in this paper consists of all rows up to May 9, 2026 at 14:57 UTC.</p>
+
+<h3>2.3&nbsp;&nbsp;Construction of the analysis dataset</h3>
+
+<p>For analysis we extract the rows on the Bitcoin track and left-join the Ethereum and price observations on the truncated minute timestamp. This yields 42,279 rows over a span of 29.9 days. Because Ethereum and price ingestion started after Bitcoin, the early portion of the window has Bitcoin-only observations. Coverage is otherwise near-complete. The median row-to-row gap is exactly one minute, with a single notable outage of 46 minutes on April 19 (18:53&ndash;19:39 UTC), attributable to an ingester restart. All correlations and percentiles are computed pairwise on non-null rows; we do not impute.</p>
+
+<table>
+  <thead>
+    <tr><th>Field</th><th>Source</th><th>First obs (UTC)</th><th>Non-null rows</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>BTC fast/med/slow fee</td><td>mempool.space</td><td>2026-04-09 17:10</td><td>42,279</td></tr>
+    <tr><td>BTC pending count</td><td>mempool.space</td><td>2026-04-09 17:10</td><td>42,279</td></tr>
+    <tr><td>ETH fast/med/slow fee</td><td>beaconcha.in gasnow</td><td>2026-04-10 13:36</td><td>40,390</td></tr>
+    <tr><td>ETH pending count</td><td>public RPC (pending blk)</td><td>2026-04-10 13:36</td><td>40,390</td></tr>
+    <tr><td>BTC spot price (USD)</td><td>mempool.space</td><td>2026-04-11 13:36</td><td>39,070</td></tr>
+  </tbody>
+</table>
+<div class="table-cap"><strong>Table 1.</strong> Dataset summary. Each field is sampled at approximately one-minute cadence into a PostgreSQL store; the analysis dataset is the left-join of the three source streams on the truncated minute.</div>
+
+<h2>3. Descriptive Statistics</h2>
+
+<p>Figure 1 presents the full thirty-day overview. The visual impression is of two extremely quiet markets. Bitcoin fast fees never exceed 12 sat/vbyte and spend most of the window between 1 and 3 sat/vbyte; Ethereum fast fees never exceed 32 gwei. Bitcoin's spot price drifted upward from $70,577 to $82,737 over the window, an increase of roughly 17%, with the typical low-amplitude chop of a trending but uneventful market.</p>
+
+<figure>
+  <img src="figures/fig1_overview.png" alt="Figure 1: 30-day overview of BTC and ETH fees with BTC price">
+  <figcaption><strong>Figure 1.</strong> Thirty-day overview of recommended fast and medium fees on Bitcoin (top), Ethereum (middle), and Bitcoin spot price (bottom). Sample interval is one minute. Both chains display sustained low-fee regimes punctuated by isolated minute-scale spikes.</figcaption>
+</figure>
+
+<p>Figure 2 shows the unconditional distributions. Bitcoin fast fees follow a roughly geometric distribution heavily concentrated at the floor of 1 sat/vbyte. Ethereum fast fees are approximately log-normal in shape, spanning roughly four orders of magnitude. The Bitcoin price distribution is bimodal, reflecting the two clusters visible in the time series around the $75k and $80k handles.</p>
+
+<figure>
+  <img src="figures/fig2_distributions.png" alt="Figure 2: Distributions of fees and price">
+  <figcaption><strong>Figure 2.</strong> Distributions of Bitcoin fast fee (left), Ethereum fast fee on log-10 scale (middle), and Bitcoin spot price (right). Bitcoin fees are concentrated at the protocol floor; Ethereum fees span four orders of magnitude.</figcaption>
+</figure>
+
+<p>Tables 2 and 3 report key percentiles for the two chains. The contrast between the 50th and 99th percentile rows is informative: a fee user willing to wait for the median condition pays approximately one quarter of what they would pay during the worst 1% of minutes, and an order of magnitude less than the most extreme observed minute. This dispersion exists even in a calm regime.</p>
+
+<table>
+  <thead>
+    <tr><th>Percentile</th><th>Fast</th><th>Medium</th><th>Slow</th><th>Mempool (tx)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>p5</td><td>1</td><td>1</td><td>1</td><td>29,332</td></tr>
+    <tr><td>p25</td><td>1</td><td>1</td><td>1</td><td>40,263</td></tr>
+    <tr><td>p50</td><td>2</td><td>1</td><td>1</td><td>50,436</td></tr>
+    <tr><td>p75</td><td>3</td><td>1</td><td>1</td><td>60,723</td></tr>
+    <tr><td>p95</td><td>4</td><td>4</td><td>3</td><td>81,715</td></tr>
+    <tr><td>p99</td><td>7</td><td>7</td><td>6</td><td>95,399</td></tr>
+    <tr><td>Max</td><td>12</td><td>11</td><td>10</td><td>111,990</td></tr>
+  </tbody>
+</table>
+<div class="table-cap"><strong>Table 2.</strong> Bitcoin fee percentiles (sat/vbyte) and mempool depth (pending tx count). The fast tier exhibits the widest dispersion; the medium and slow tiers are both pinned at 1 sat/vbyte for the bottom three quartiles.</div>
+
+<table>
+  <thead>
+    <tr><th>Percentile</th><th>Fast (gwei)</th><th>Medium (gwei)</th><th>Slow (gwei)</th><th>Mempool (tx)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>p5</td><td>0.07</td><td>0.06</td><td>0.05</td><td>12</td></tr>
+    <tr><td>p25</td><td>0.23</td><td>0.19</td><td>0.15</td><td>56</td></tr>
+    <tr><td>p50</td><td>0.41</td><td>0.34</td><td>0.27</td><td>99</td></tr>
+    <tr><td>p75</td><td>1.03</td><td>0.86</td><td>0.69</td><td>166</td></tr>
+    <tr><td>p95</td><td>3.98</td><td>3.32</td><td>2.65</td><td>488</td></tr>
+    <tr><td>p99</td><td>10.25</td><td>8.54</td><td>6.83</td><td>2,202</td></tr>
+    <tr><td>Max</td><td>31.98</td><td>26.61</td><td>21.28</td><td>2,801</td></tr>
+  </tbody>
+</table>
+<div class="table-cap"><strong>Table 3.</strong> Ethereum fee percentiles (gwei) and mempool depth (pending tx count from public RPC). The fee tiers display orderly compression across percentiles; the mempool count, in contrast, varies wildly &ndash; foreshadowing the API caveat in Section 6.3.</div>
+
+<h2>4. Cross-Chain Co-movement</h2>
+
+<p>A natural question is whether fee pressure on Bitcoin and Ethereum is driven by common factors. Common-factor stories range from the macroeconomic (a risk-on shift boosts on-chain activity in both ecosystems simultaneously) to the technical (cross-chain arbitrage during a price move forces transactions on both chains). Either story implies non-trivial contemporaneous correlation in fee levels.</p>
+
+<p>In our window, the Spearman rank correlation between minute-level Bitcoin fast fees and Ethereum fast fees is 0.145 (Pearson 0.115). This is a weak relationship. Figure 3 shows the two series as one-hour-smoothed z-scores on a shared axis, with annotations for the three notable spikes discussed in Section 6. By visual inspection, the two series move largely independently; episodes where both chains are simultaneously elevated by more than one standard deviation are uncommon.</p>
+
+<figure>
+  <img src="figures/fig3_cross_chain.png" alt="Figure 3: Cross-chain z-scored fee co-movement">
+  <figcaption><strong>Figure 3.</strong> Bitcoin and Ethereum fast-fee z-scores, 1-hour rolling mean. Annotated events: April 17 Bitcoin spike, May 8 Ethereum API anomaly, May 9 Bitcoin spike. The two chains exhibit largely independent fluctuations during the window.</figcaption>
+</figure>
+
+<p>We caution against over-interpretation. Thirty days is a short window, and a calm regime is precisely the setting in which common-factor effects would be expected to be smallest in absolute terms. A regime including a major macro event or a sustained congestion episode on either chain would likely produce a different reading. The result here is best interpreted as a baseline against which future regimes may be compared.</p>
+
+<h2>5. Intra-day Structure</h2>
+
+<p>Fee markets reflect the underlying activity patterns of the user base. Bitcoin's user base is geographically broader and arguably more nocturnal than Ethereum's, given the concentration of decentralised-finance and NFT activity on Ethereum among users in U.S. and European time zones. We test whether this distinction shows up in the diurnal fee profile.</p>
+
+<figure>
+  <img src="figures/fig4_diurnal.png" alt="Figure 4: Diurnal heatmaps">
+  <figcaption><strong>Figure 4.</strong> Median fast fee by hour-of-day (UTC) and day-of-week, on Bitcoin (left, sat/vbyte) and Ethereum (right, gwei). Both chains display a mid-day UTC peak and an overnight-UTC trough, but the precise peak hour and weekday gradient differ.</figcaption>
+</figure>
+
+<p>Bitcoin median fees peak at hour 12:00 UTC and trough at 00:00 UTC. Ethereum's peak occurs slightly earlier at 10:00 UTC and the trough at 23:00 UTC. The roughly two-hour offset is consistent with the hypothesis that Asian-hours DeFi activity contributes meaningfully to Ethereum's demand profile, while Bitcoin's profile more cleanly tracks U.S./European trading hours. Figure 4 also reveals weekday-versus-weekend differences, with Saturdays and Sundays generally showing lower fees than weekdays on both chains, though the effect is more pronounced on Ethereum.</p>
+
+<h2>6. Notable Events</h2>
+
+<h3>6.1&nbsp;&nbsp;Mempool depth and fee response</h3>
+
+<p>Within Bitcoin, the contemporaneous Spearman correlation between mempool pending-tx count and fast-fee level is 0.368 &ndash; a moderate, monotonic relationship of the sort one would expect from textbook fee-market intuition. On Ethereum the analogous correlation is &minus;0.009, which is indistinguishable from zero. This is anomalous on its face: Ethereum's fee mechanism is, if anything, more directly mempool-driven than Bitcoin's after EIP-1559. We diagnose the source of the anomaly in Section 6.3.</p>
+
+<figure>
+  <img src="figures/fig5_mempool_fee.png" alt="Figure 5: Mempool vs fee for BTC and ETH">
+  <figcaption><strong>Figure 5.</strong> Mempool depth versus fast fee. Bitcoin (left) shows a clean monotonic relationship: the bin-median curve (black) rises smoothly with mempool depth. Ethereum (right, log-scaled fee) shows essentially no relationship between the public-RPC pending count and the gas-fee feed.</figcaption>
+</figure>
+
+<h3>6.2&nbsp;&nbsp;The May 9 Bitcoin fee spike</h3>
+
+<p>The largest Bitcoin fee event in the window occurred on the closing day of ingestion, May 9, 2026. Beginning around 09:00 UTC, the fast tier rose from its baseline of 1&ndash;2 sat/vbyte to a peak of 12 sat/vbyte at 09:13 UTC, with the medium tier reaching 11. Mempool depth simultaneously climbed to 89,000 pending transactions, more than 1.7 times the 30-day median. Bitcoin's spot price during the same window was effectively flat at approximately $80,300, suggesting the spike was demand-side rather than price-driven. Figure 6 zooms into the event.</p>
+
+<figure>
+  <img src="figures/fig6_may9_event.png" alt="Figure 6: May 9 event zoom">
+  <figcaption><strong>Figure 6.</strong> Bitcoin fee, mempool, and price on May 9, 2026, 06:00&ndash;14:57 UTC. The fast-fee spike near 09:13 is contemporaneous with a mempool surge but is not accompanied by a notable price move. The cause of the underlying demand surge is, as of writing, undetermined.</figcaption>
+</figure>
+
+<h3>6.3&nbsp;&nbsp;The May 8 Ethereum &ldquo;spike&rdquo; and a public-API caveat</h3>
+
+<p>On May 8 between 04:43 and 04:47 UTC, the beaconcha.in <em>gasnow</em> rapid tier briefly read 32 gwei &ndash; roughly 80&times; the 30-day median fast-fee level. Under the standard interpretation of a fee feed, this would imply an acute congestion event. However, the parallel ETH mempool count from the public RPC was simultaneously between 28 and 69 pending transactions &ndash; well below the 30-day median of 99 and inconsistent with congestion. A small handful of high-tip private-orderflow transactions (likely MEV-related) appears the most plausible explanation: a single bundle paying an outlier tip can dominate the &ldquo;rapid&rdquo; estimator without measurably affecting the public mempool.</p>
+
+<p>This observation has methodological implications. Researchers using public Ethereum fee APIs at minute resolution should be aware that the rapid-tier feed can be moved by isolated private-orderflow transactions that do not represent the broader fee environment. It also explains the near-zero ETH-fee/mempool correlation reported above: the fee feed and the pending-block count effectively measure different populations of transactions, and the latter is itself unreliable across public RPC providers.</p>
+
+<h3>6.4&nbsp;&nbsp;Fees versus price and realised volatility</h3>
+
+<p>A common informal claim is that on-chain fees rise during periods of high price volatility, on the theory that volatility drives both arbitrage flow and end-user liquidations. In the calm regime studied here, this relationship is essentially absent. The contemporaneous Spearman correlation between Bitcoin fast fees and spot price is 0.123; the correlation between fast fees and the absolute one-hour rolling price change is 0.022. We do not interpret this as evidence against the volatility-fee link in general; the window simply does not contain the kind of large price moves that would test the hypothesis. It does, however, suggest that the relationship is not present in the modal calm regime, and any future paper on this question should be careful to specify the regime under which the claim is being made.</p>
+
+<h2>7. Conclusion and Next Steps</h2>
+
+<p>This paper documents a thirty-day, minute-resolution dataset of Bitcoin and Ethereum fee dynamics during a calm regime. The findings &ndash; weak cross-chain co-movement, a clean BTC-mempool relationship, a broken ETH-mempool relationship, distinguishable diurnal profiles across the two chains, and a near-zero fee-price relationship in the absence of a real volatility shock &ndash; together provide a baseline characterisation of fee markets in their modal state, against which future regime-shift studies can be compared.</p>
+
+<p>Three immediate next steps are planned. First, ingestion will continue uninterrupted, with the goal of capturing at least ninety days of data including any congestion event that occurs in the meantime; the May 9 Bitcoin spike already documented in this paper hints that such events may not be far off. Second, the dataset and ingestion code will be released openly, allowing replication and broader use. Third, a companion methodological note will document the specific failure modes of public fee APIs at minute resolution observed here, including the May 8 Ethereum anomaly and the general unreliability of public-RPC pending-block transaction counts.</p>
+
+<p>We close with a caveat. Thirty days is a short window, and a calm thirty days is shorter still in information content. None of the findings reported here should be treated as conclusive about cross-chain fee dynamics in general; they describe one regime in detail. The contribution lies in the careful documentation of that regime and in the dataset itself.</p>
+
+<h2>Data and Code Availability</h2>
+
+<p>The full minute-resolution CSV used in this paper, together with the Python ingestion scripts and the analysis notebook, are intended to be released under a permissive license at the time of publication. Please contact the author for early access.</p>
+
+<div class="footer">
+This paper is presented for informational and educational purposes only. The findings describe a single thirty-day window and should not be treated as conclusive about fee-market dynamics in general.<br><br>
+Correspondence and discussion welcome.
+</div>
+
+</div>
+</body>
+</html>
